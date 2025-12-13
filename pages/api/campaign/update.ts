@@ -102,7 +102,11 @@ export default async function handler(
         const localDir = path.join(process.cwd(), "data");
         if (!fs.existsSync(localDir)) fs.mkdirSync(localDir);
         const localFile = path.join(localDir, "campaign.json");
-        const current = currentData || { current_bags: 0, goal: 5000, title: "" };
+        const current = currentData || {
+          current_bags: 0,
+          goal: 5000,
+          title: "",
+        };
         const out = { ...current, ...updated };
         fs.writeFileSync(localFile, JSON.stringify(out, null, 2), "utf-8");
         return res

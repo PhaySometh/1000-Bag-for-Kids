@@ -31,8 +31,12 @@ export default function ProgressBar({ current, goal, milestone }: Props) {
     <div className="w-full">
       <div className="flex justify-between mb-2 items-end">
         <div className="flex items-baseline gap-3">
-          <div className="text-2xl md:text-3xl font-bold text-white">គោលដៅរបស់ពួកយើង</div>
-          <div className="text-sm font-medium text-white/90">{display} / {goal} កាបូប</div>
+          <div className="text-2xl md:text-3xl font-bold text-white">
+            គោលដៅរបស់ពួកយើង
+          </div>
+          <div className="text-sm font-medium text-white/90">
+            {display} / {goal} កាបូប
+          </div>
         </div>
         <div className="text-sm font-medium text-white/90">{pct}%</div>
       </div>
@@ -47,13 +51,16 @@ export default function ProgressBar({ current, goal, milestone }: Props) {
             }}
           />
         </div>
-        {typeof milestone === "number" && goal > 0 ? (
-          (() => {
-            const pct = Math.min(100, Math.max(0, Math.round((milestone / goal) * 100)));
-            // tooltip state handled per marker
-            return <MilestoneMarker percent={pct} value={milestone} />;
-          })()
-        ) : null}
+        {typeof milestone === "number" && goal > 0
+          ? (() => {
+              const pct = Math.min(
+                100,
+                Math.max(0, Math.round((milestone / goal) * 100))
+              );
+              // tooltip state handled per marker
+              return <MilestoneMarker percent={pct} value={milestone} />;
+            })()
+          : null}
         <div className="absolute left-0 top-0 h-4 flex items-center justify-center w-full pointer-events-none">
           {/* subtle indicator */}
         </div>
@@ -62,7 +69,13 @@ export default function ProgressBar({ current, goal, milestone }: Props) {
   );
 }
 
-function MilestoneMarker({ percent, value }: { percent: number; value: number }) {
+function MilestoneMarker({
+  percent,
+  value,
+}: {
+  percent: number;
+  value: number;
+}) {
   const [open, setOpen] = useState(false);
   function toggle() {
     setOpen((s) => !s);

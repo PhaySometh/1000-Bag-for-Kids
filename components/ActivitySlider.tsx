@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 
-const IMAGES = Array.from({ length: 10 }, (_, i) => `/images/activity${i + 1}.png`);
+const IMAGES = Array.from(
+  { length: 10 },
+  (_, i) => `/images/activity${i + 1}.png`
+);
 
 export default function ActivitySlider() {
   const N = IMAGES.length;
@@ -51,7 +54,8 @@ export default function ActivitySlider() {
   useEffect(() => {
     return () => {
       if (scrollDebounce.current) window.clearTimeout(scrollDebounce.current);
-      if (centerTimeoutRef.current) window.clearTimeout(centerTimeoutRef.current);
+      if (centerTimeoutRef.current)
+        window.clearTimeout(centerTimeoutRef.current);
     };
   }, []);
 
@@ -64,16 +68,16 @@ export default function ActivitySlider() {
   }
 
   function toMiddleIndex(logical: number) {
-    return base + ((logical % N) + N) % N;
+    return base + (((logical % N) + N) % N);
   }
 
   function getLogical(i: number) {
-    return ((i - base) % N + N) % N;
+    return (((i - base) % N) + N) % N;
   }
 
   function goByDelta(delta: number) {
     const currentLogical = getLogical(index);
-    const targetLogical = ((currentLogical + delta) % N + N) % N;
+    const targetLogical = (((currentLogical + delta) % N) + N) % N;
     goToLogicalIndex(targetLogical);
   }
 
@@ -82,7 +86,11 @@ export default function ActivitySlider() {
     const containerEl = containerRef.current;
     if (!trackEl || !containerEl) return;
 
-    const candidates = [targetLogical, base + targetLogical, base * 2 + targetLogical];
+    const candidates = [
+      targetLogical,
+      base + targetLogical,
+      base * 2 + targetLogical,
+    ];
     const currentI = index;
     let best = candidates[0];
     let bestDist = Math.abs(best - currentI);
@@ -98,28 +106,39 @@ export default function ActivitySlider() {
     if (!targetItem) return;
 
     const containerW = containerEl.clientWidth;
-    const targetCenter = Math.max(0, targetItem.offsetLeft + targetItem.offsetWidth / 2 - containerW / 2);
+    const targetCenter = Math.max(
+      0,
+      targetItem.offsetLeft + targetItem.offsetWidth / 2 - containerW / 2
+    );
     // set visual center to the candidate so it receives the scale class
     skipCenterRef.current = true;
     setIndex(best);
     setSuppressSnap(true);
     // animate to candidate center after visual state updates
-      // animate to targetCandidate center after layout updated by setIndex(best)
-      try {
-        requestAnimationFrame(() => {
-          // recompute after DOM/layout changes caused by setIndex
-          const updatedItems = Array.from(trackEl.children) as HTMLElement[];
-          const updatedTarget = updatedItems[best];
-          const updatedTargetCenter = Math.max(0, updatedTarget.offsetLeft + updatedTarget.offsetWidth / 2 - containerW / 2);
-          try {
-            containerEl.scrollTo({ left: updatedTargetCenter, behavior: "smooth" });
-          } catch (e) {
-            containerEl.scrollLeft = updatedTargetCenter;
-          }
-        });
-      } catch (err) {
-        containerEl.scrollLeft = targetCenter;
-      }
+    // animate to targetCandidate center after layout updated by setIndex(best)
+    try {
+      requestAnimationFrame(() => {
+        // recompute after DOM/layout changes caused by setIndex
+        const updatedItems = Array.from(trackEl.children) as HTMLElement[];
+        const updatedTarget = updatedItems[best];
+        const updatedTargetCenter = Math.max(
+          0,
+          updatedTarget.offsetLeft +
+            updatedTarget.offsetWidth / 2 -
+            containerW / 2
+        );
+        try {
+          containerEl.scrollTo({
+            left: updatedTargetCenter,
+            behavior: "smooth",
+          });
+        } catch (e) {
+          containerEl.scrollLeft = updatedTargetCenter;
+        }
+      });
+    } catch (err) {
+      containerEl.scrollLeft = targetCenter;
+    }
 
     // after animation, reset to middle copy index
     if (centerTimeoutRef.current) window.clearTimeout(centerTimeoutRef.current);
@@ -127,9 +146,15 @@ export default function ActivitySlider() {
       const middleIdx = toMiddleIndex(targetLogical);
       const midItem = items[middleIdx];
       if (midItem) {
-        const midCenter = Math.max(0, midItem.offsetLeft + midItem.offsetWidth / 2 - containerW / 2);
+        const midCenter = Math.max(
+          0,
+          midItem.offsetLeft + midItem.offsetWidth / 2 - containerW / 2
+        );
         // instant reposition to middle copy
-        containerEl.scrollLeft = Math.min(Math.max(0, trackEl.scrollWidth - containerW), midCenter);
+        containerEl.scrollLeft = Math.min(
+          Math.max(0, trackEl.scrollWidth - containerW),
+          midCenter
+        );
         skipCenterRef.current = true;
         setIndex(middleIdx);
       }
@@ -284,7 +309,6 @@ export default function ActivitySlider() {
             scrollSnapType: (suppressSnap ? "none" : "x mandatory") as any,
             scrollBehavior: "smooth",
           }}
-
         >
           <div
             ref={trackRef}
@@ -294,8 +318,8 @@ export default function ActivitySlider() {
             {RENDER_IMAGES.map((src, i) => {
               const isCenter = i === index;
               return (
-                  <div
-                    key={`${src}-${i}`}
+                <div
+                  key={`${src}-${i}`}
                   className={`flex-shrink-0 rounded-xl overflow-hidden bg-white/5 transition-all duration-500 shadow-sm`}
                   style={{
                     width: isCenter ? "min(72vw, 360px)" : "min(44vw, 240px)",
@@ -345,7 +369,7 @@ export default function ActivitySlider() {
               onClick={() => goToLogicalIndex(i)}
               aria-label={`Go to slide ${i + 1}`}
               className={`w-2 h-2 rounded-full ${
-                i === ((index - base + N) % N) ? "bg-white" : "bg-white/20"
+                i === (index - base + N) % N ? "bg-white" : "bg-white/20"
               }`}
             />
           ))}

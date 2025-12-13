@@ -51,7 +51,7 @@ export default async function handler(
         subtitle: "សម្រាប់ក្មេងៗភៀសសឹក",
         current_bags: 0,
         goal: 5000,
-          donation_items: [
+        donation_items: [
           "អាវរងារ និង សំលៀកបំពាក់ផ្សេងៗ",
           "ភេសជ្ជៈនំចំណី",
           "សៀវភៅសម្រាប់អាន",
