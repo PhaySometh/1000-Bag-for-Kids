@@ -214,7 +214,7 @@ export default function Home() {
             </div>
             <div className="mt-2 flex items-center gap-3">
               <a
-                href={`https://www.google.com/maps/dir/?api=1&destination=11.655537444160784,104.90335279186975`}
+                href={"https://www.google.com/maps/dir//CADT+-+Innovation+Center,+2nd+Bridge+Prek+Leap,+National+Road+Number+6,+Phnom+Penh,+12252/@11.6541735,104.9089508,17z/data=!4m8!4m7!1m0!1m5!1m1!1s0x310953bad45e4ee1:0x6c33cb023d508017!2m2!1d104.9114229!2d11.654289?hl=en&entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoKLDEwMDc5MjA3M0gBUAM%3D"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-3 py-2 bg-primary text-white rounded-md shadow-sm"
