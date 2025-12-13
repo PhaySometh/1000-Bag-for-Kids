@@ -47,11 +47,11 @@ export default async function handler(
       // seed default
       const seed = {
         id: "default",
-        title: "មូលនិធិ១ពាន់កាបូបនៃស្នាមញញឹម",
+        title: "មូលនិធិ៥ពាន់កាបូបនៃស្នាមញញឹម",
         subtitle: "សម្រាប់ក្មេងៗភៀសសឹក",
         current_bags: 0,
-        goal: 1000,
-        donation_items: [
+        goal: 5000,
+          donation_items: [
           "អាវរងារ និង សំលៀកបំពាក់ផ្សេងៗ",
           "ភេសជ្ជៈនំចំណី",
           "សៀវភៅសម្រាប់អាន",

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import ProgressBar from "../components/ProgressBar";
 
 import Image from "next/image";
+import ActivitySlider from "../components/ActivitySlider";
 
 type Campaign = {
   title: string;
@@ -21,7 +22,7 @@ export default function Home() {
 
   // compute parts for title: prefix (text before numeral), numeral, and rest (after numeral)
   const titleParts = (() => {
-    const defaultTitle = "មូលនិធិ១ពាន់កាបូបនៃស្នាមញញឹម";
+    const defaultTitle = "មូលនិធិ៥ពាន់កាបូបនៃស្នាមញញឹម";
     const t = campaign?.title ?? defaultTitle;
     try {
       const parts = t.match(/\p{N}+|[^\p{N}]+/gu) || [t];
@@ -59,7 +60,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-campaign-gradient text-white">
-      <section className="relative w-full h-72 sm:h-[420px] md:h-[520px] overflow-hidden">
+      <section className="relative w-full h-[520px] sm:h-[640px] md:h-[720px] overflow-hidden">
         <Image
           src="/images/hero.png"
           alt="hero"
@@ -68,8 +69,8 @@ export default function Home() {
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/40" />
-        <div className="absolute inset-0 flex items-end px-6 py-6 sm:px-8 sm:py-8 md:px-10 md:py-10">
-          <div className="max-w-3xl mx-auto w-full text-white">
+        <div className="absolute inset-0 flex items-start sm:items-end px-6 py-6 sm:px-8 sm:py-8 md:px-10 md:py-10">
+          <div className="max-w-3xl mx-auto w-full text-white pt-6 sm:pt-0 hero-inner">
             <h1 className="text-3xl md:text-5xl font-bold leading-tight">
               {titleParts.prefix ? (
                 <span className="text-altGreen align-bottom">
@@ -98,13 +99,14 @@ export default function Home() {
                 />
               </div>
             </div>
-            <div className="mt-3 w-full bg-white/10 rounded-xl p-3">
+            <div className="mt-3 w-full bg-white/10 rounded-xl p-3 progress-space">
               <ProgressBar
                 current={campaign?.current_bags ?? 0}
-                goal={campaign?.goal ?? 1000}
+                goal={campaign?.goal ?? 5000}
+                milestone={1000}
               />
               <div className="text-xs text-white/80 mt-2">
-                ចុងក្រោយ​កែប្រែ:{" "}
+                កែប្រែចុងក្រោយ​:{" "}
                 {campaign?.last_updated
                   ? new Date(campaign.last_updated).toLocaleString()
                   : "—"}
@@ -129,7 +131,7 @@ export default function Home() {
           >
             បណ្ឌិត្យសភាបច្ចេកវិទ្យាឌីជីថលកម្ពុជា (CADT), Makerspace
             និងសមាគមនិស្សិតមានសេចក្ដីរំភើបដែលបានចូលរួមរៀបចំ
-            មូលនិធិ១ពាន់កាបូបនៃស្នាមញញឹម ដែលយើងមានគោលបំណងរួម
+            មូលនិធិ៥ពាន់កាបូបនៃស្នាមញញឹម ដែលយើងមានគោលបំណងរួម
             ក្នុងការបរិច្ចាគដើម្បីផ្តល់ស្នាមញញឹមដល់ កុមារា កុមារីតូចៗ
             ជាកាបូបផ្ទុកដោយសម្ភារសិក្សា អាហារ
             សំលៀកបំពាក់ជាដើមដែលកំពុងត្រូវការជំនួយ។ ហើយអ្វីដែលកាន់តែរំភើបជាងនេះគឺ
@@ -225,10 +227,58 @@ export default function Home() {
               </a>
             </div>
           </div>
+          {/* New second location - Public Service Center */}
+          <div className="mb-2 mt-6">
+            <div className="inline-flex items-end gap-3">
+              <div className="w-7 sm:w-8">
+                <Image
+                  src="/images/location.png"
+                  width={32}
+                  height={32}
+                  alt="location"
+                  className="w-full h-auto"
+                />
+              </div>
+              <div className="text-left">
+                <div className="text-darkBlue">
+                  <span className="font-bold">មជ្ឈមណ្ឌលផ្ដល់សេវាសាធារណៈ</span>
+                  <span className="ml-1">
+                    {" "}
+                    (Public Service Center) របស់ក្រសួងប្រៃសណីយ៍ និងទូរគមនាគមន៍
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="mx-auto w-full max-w-3xl">
+            <div className="w-full h-56 sm:h-72 md:h-96 rounded overflow-hidden border border-gray-200 shadow-sm">
+              <iframe
+                className="w-full h-full"
+                src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1103.1314627474608!2d104.9175312!3d11.5752534!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31095142eadcf8db%3A0xbd4e32a5eccddfb7!2sMinistry%20of%20Post%20and%20Telecommunications!5e1!3m2!1sen!2skh!4v1765644331160!5m2!1sen!2skh"
+                style={{ border: 0 }}
+                allowFullScreen={true}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Ministry of Post and Telecommunications"
+              />
+            </div>
+            <div className="mt-2 flex items-center gap-3">
+              <a
+                href={
+                  "https://www.google.com/maps/dir//Ministry+of+Post+and+Telecommunications,+Builing+13+Preah+Monivong+Blvd+(93),+Phnom+Penh/@11.5752534,104.9175312,253m/data=!3m1!1e3!4m16!1m7!3m6!1s0x31095142eadcf8db:0xbd4e32a5eccddfb7!2sMinistry+of+Post+and+Telecommunications!8m2!3d11.5752627!4d104.9173786!16s%2Fg%2F1yfdrw680!4m7!1m0!1m5!1m1!1s0x31095142eadcf8db:0xbd4e32a5eccddfb7!2m2!1d104.9173786!2d11.5752627?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoKLDEwMDc5MjA3M0gBUAM%3D"
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-3 py-2 bg-primary text-white rounded-md shadow-sm"
+              >
+                Get Directions
+              </a>
+            </div>
+          </div>
         </section>
 
         <section className="mt-6 p-4 text-center animate-fadeUp">
-          <h2 className="text-2xl md:text-3xl font-bold mb-2 text-darkBlue flex items-center justify-center gap-2">
+          <h2 className="text-2xl md:text-3xl font-bold mb-2 text-darkBlue flex items-center justify-center gap-2 donate-header">
             <span className="align-bottom">អាចបរិច្ចាគតាមរយៈ</span>
             <div className="w-10 md:w-14 lg:w-16 shrink-0">
               <Image
@@ -240,10 +290,10 @@ export default function Home() {
               />
             </div>
 
-            <span className="align-bottom">ខាងក្រោមនេះ</span>
+            <span className="align-bottom donate-last">ខាងក្រោមនេះ</span>
           </h2>
-          <div className="mx-auto w-full flex flex-col sm:flex-row items-center justify-center gap-6 py-4">
-            <div className="flex flex-col items-center">
+          <div className="mx-auto w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 py-4">
+            <div className="flex flex-col items-center w-full">
               <div className="w-44 sm:w-72">
                 <Image
                   src="/images/qr_usd.png"
@@ -254,7 +304,7 @@ export default function Home() {
                 />
               </div>
             </div>
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center w-full">
               <div className="w-44 sm:w-72">
                 <Image
                   src="/images/qr_khr.png"
@@ -267,6 +317,8 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <ActivitySlider />
 
         <section className="mt-6 p-4 animate-fadeUp">
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
@@ -296,10 +348,7 @@ export default function Home() {
           </div>
         </section>
 
-        <footer className="text-center text-xs text-white/60 mt-6 pb-10">
-          This page is built for a community campaign; thank you for supporting
-          the children.
-        </footer>
+        <footer className="text-center text-xs text-white/60 mt-6 pb-10" />
       </main>
     </div>
   );

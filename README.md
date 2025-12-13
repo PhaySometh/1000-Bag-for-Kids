@@ -1,4 +1,4 @@
-# មូលនិធិ ១ ពាន់ កាបូប នៃស្នាមញញឹម
+# មូលនិធិ ៥ ពាន់ កាបូប នៃស្នាមញញឹម
 
 This is a small one-page campaign site built with Next.js and Tailwind CSS. It uses Supabase for storing the campaign state (current bags, goal, items, and last updated). The admin page allows quick updates using buttons or a manual value.
 
@@ -37,7 +37,7 @@ create table campaign (
   title text,
   subtitle text,
   current_bags integer default 0,
-  goal integer default 1000,
+  goal integer default 5000,
   donation_items jsonb,
   location_url text,
   qr_url text,
@@ -46,7 +46,7 @@ create table campaign (
 );
 
 insert into campaign (id, title, subtitle, current_bags, goal, donation_items, last_updated) values (
-  'default', 'មូលនិធិ១ពាន់កាបូបនៃស្នាមញញឹម', 'សម្រាប់ក្មេងៗភៀសសឹក', 0, 1000, '[]', now()
+  'default', 'មូលនិធិ៥ពាន់កាបូបនៃស្នាមញញឹម', 'សម្រាប់ក្មេងៗភៀសសឹក', 0, 5000, '[]', now()
 );
 ```
 

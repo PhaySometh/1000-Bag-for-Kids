@@ -11,7 +11,7 @@ export default async function handler(
 ) {
   if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
-  const { adminPassword, change, manual } = req.body;
+  const { adminPassword, change, manual, goal, title } = req.body;
   if (adminPassword !== ADMIN_PASSWORD)
     return res.status(401).json({ error: "Unauthorized" });
 
@@ -57,27 +57,36 @@ export default async function handler(
     }
     const current_bags = currentData?.current_bags ?? 0;
     let newCount = current_bags;
+    let newGoal = currentData?.goal ?? 5000;
+    let newTitle = currentData?.title ?? "";
     if (typeof manual === "number") newCount = manual;
     else if (typeof change === "number")
       newCount = Math.max(0, current_bags + change);
+    if (typeof goal === "number") {
+      // ensure non-negative integer
+      newGoal = Math.max(0, Math.round(goal));
+    }
+    if (typeof title === "string") newTitle = title;
 
-    const updated = {
+    const updated: any = {
       current_bags: newCount,
       last_updated: new Date().toISOString(),
     };
+    if (typeof newGoal === "number") updated.goal = newGoal;
+    if (typeof newTitle === "string") updated.title = newTitle;
 
     // upsert
     if (supabase) {
       const { data, error } = await supabase
         .from("campaign")
-        .upsert({ id: "default", ...updated });
+        .upsert({ id: "default", ...currentData, ...updated });
       if (error) {
         // fallback to local if possible
         try {
           const localDir = path.join(process.cwd(), "data");
           if (!fs.existsSync(localDir)) fs.mkdirSync(localDir);
           const localFile = path.join(localDir, "campaign.json");
-          const current = currentData || { current_bags: 0, goal: 1000 };
+          const current = currentData || { current_bags: 0, goal: 5000 };
           const out = { ...current, ...updated };
           fs.writeFileSync(localFile, JSON.stringify(out, null, 2), "utf-8");
           return res
@@ -93,7 +102,7 @@ export default async function handler(
         const localDir = path.join(process.cwd(), "data");
         if (!fs.existsSync(localDir)) fs.mkdirSync(localDir);
         const localFile = path.join(localDir, "campaign.json");
-        const current = currentData || { current_bags: 0, goal: 1000 };
+        const current = currentData || { current_bags: 0, goal: 5000, title: "" };
         const out = { ...current, ...updated };
         fs.writeFileSync(localFile, JSON.stringify(out, null, 2), "utf-8");
         return res

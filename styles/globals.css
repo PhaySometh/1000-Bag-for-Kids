@@ -74,3 +74,38 @@ body {
     rgba(19, 40, 76, 1) 100%
   );
 }
+
+/* Donation header responsive behavior */
+.donate-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+@media (max-width: 445px) {
+  .donate-header {
+    justify-content: center;
+    align-items: center;
+  }
+  .donate-header .donate-last {
+    width: 100%;
+    display: block;
+    text-align: center;
+    margin-top: 0.25rem;
+  }
+}
+
+/* Additional small-screen spacing for hero title */
+@media (max-width: 500px) {
+  .hero-inner {
+    padding-top: 3rem /* 48px */;
+  }
+}
+
+/* Add extra bottom space under the progress bar for small screens */
+@media (max-width: 500px) {
+  .progress-space {
+    margin-bottom: 2.5rem; /* 40px */
+  }
+}

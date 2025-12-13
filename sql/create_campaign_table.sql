@@ -4,7 +4,7 @@ create table if not exists public.campaign (
   title text,
   subtitle text,
   current_bags integer default 0,
-  goal integer default 1000,
+  goal integer default 5000,
   donation_items jsonb,
   location_url text,
   qr_url text,
@@ -16,10 +16,10 @@ create table if not exists public.campaign (
 insert into public.campaign (id, title, subtitle, current_bags, goal, donation_items, location_url, qr_url, school_name, last_updated)
 values (
   'default',
-  'មូលនិធិ១ពាន់កាបូបនៃស្នាមញញឹម',
+  'មូលនិធិ៥ពាន់កាបូបនៃស្នាមញញឹម',
   'សម្រាប់ក្មេងៗភៀសសឹក',
   0,
-  1000,
+  5000,
   '["អាវរងារ និង សំលៀកបំពាក់ផ្សេងៗ", "ភេសជ្ជៈនំចំណី", "សៀវភៅសម្រាប់អាន", "សម្ភារៈសម្រាប់សរសេរ និងគូរ", "សម្ភារៈក្មេងលេង"]',
   'https://maps.google.com/?q=phnom+penh',
   '',
@@ -37,7 +37,7 @@ create table if not exists campaign (
   title text,
   subtitle text,
   current_bags integer default 0,
-  goal integer default 1000,
+  goal integer default 5000,
   donation_items jsonb,
   location_url text,
   qr_url text,
@@ -46,5 +46,5 @@ create table if not exists campaign (
 );
 
 insert into campaign (id, title, subtitle, current_bags, goal, donation_items, last_updated)
-values ('default', 'មូលនិធិ១ពាន់កាបូបនៃស្នាមញញឹម', 'សម្រាប់ក្មេងៗភៀសសឹក', 0, 1000, '[]', now())
+values ('default', 'មូលនិធិ៥ពាន់កាបូបនៃស្នាមញញឹម', 'សម្រាប់ក្មេងៗភៀសសឹក', 0, 5000, '[]', now())
 on conflict (id) do nothing;
