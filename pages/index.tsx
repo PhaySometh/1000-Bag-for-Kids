@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import ProgressBar from "../components/ProgressBar";
 import Image from "next/image";
 import ActivitySlider from "../components/ActivitySlider";
@@ -26,6 +26,7 @@ type Message = {
 
 export default function Home() {
   const { t, language } = useLanguage();
+  const donateRef = useRef<HTMLElement>(null);
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [donorName, setDonorName] = useState("");
   const [donorMessage, setDonorMessage] = useState("");
@@ -84,6 +85,11 @@ export default function Home() {
     loadMessages();
   }, []);
 
+  // Scroll to donate section
+  const scrollToDonate = () => {
+    donateRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   // Show notification overlay
   const showNotificationOverlay = (message: string, type: "success" | "error") => {
     setNotificationMessage(message);
@@ -128,8 +134,16 @@ export default function Home() {
   };
   return (
     <div className="min-h-screen bg-campaign-gradient text-white">
-      {/* Language Switcher */}
-      <LanguageSwitcher />
+      {/* Top Navigation */}
+      <div className="fixed top-4 right-4 z-40 flex items-center gap-8">
+        <button
+          onClick={scrollToDonate}
+          className="hidden md:block bg-primary hover:bg-primary/90 text-white font-bold py-2 px-6 rounded-md transition-colors shadow-lg"
+        >
+          {language === 'km' ? 'បរិច្ចាគទៅកុមារ' : 'Donate'}
+        </button>
+        <LanguageSwitcher />
+      </div>
 
       {/* Notification Overlay */}
       {showNotification && (
@@ -211,6 +225,15 @@ export default function Home() {
                   ? new Date(campaign.last_updated).toLocaleString()
                   : "—"}
               </div>
+            </div>
+            {/* Mobile Donate Button - Below progress bar */}
+            <div className="flex md:hidden items-center justify-center mt-4">
+              <button
+                onClick={scrollToDonate}
+                className="bg-primary hover:bg-primary/90 text-white font-bold py-2 px-6 rounded-md transition-colors shadow-lg"
+              >
+                {language === 'km' ? 'បរិច្ចាគទៅកុមារ' : 'Donate'}
+              </button>
             </div>
           </div>
         </div>
@@ -359,7 +382,7 @@ export default function Home() {
         </section>
 
         {/* Donate Section (QR Codes) */}
-        <section className="mt-6 p-4 text-center animate-fadeUp">
+        <section ref={donateRef} className="mt-6 p-4 text-center animate-fadeUp">
           <h2 className="text-2xl md:text-3xl font-bold mb-2 text-darkBlue flex items-center justify-center gap-2 donate-header">
             <span className="align-bottom">{t('qr.title.prefix')}</span>
             <div className="w-10 md:w-14 lg:w-16 shrink-0">
@@ -399,6 +422,31 @@ export default function Home() {
                 />
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* International Donation Section */}
+        <section className="international_donation mt-6 p-4 animate-fadeUp">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-darkBlue">
+              {t('international.title')}
+            </h2>
+            <p className="text-base md:text-lg text-darkBlue font-semibold mb-6 p-4 rounded-lg"
+              style={{
+                background: "linear-gradient(90deg, rgba(248,141,42,0.95) 0%, rgba(248,141,42,0.12) 100%)",
+              }}
+            >
+              {t('international.description')}
+            </p>
+            <a
+              href=""
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-md shadow-lg transition-colors"
+            >
+              <span>🌍</span>
+              <span>{t('international.button')}</span>
+            </a>
           </div>
         </section>
 

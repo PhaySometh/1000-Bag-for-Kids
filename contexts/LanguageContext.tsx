@@ -57,10 +57,10 @@ const translations: Record<Language, Record<string, string>> = {
         'message.title': 'សរសេរសារជូនកុមារ',
         'message.yourName': 'ឈ្មោះរបស់អ្នក (Your Name)',
         'message.yourNamePlaceholder': 'បញ្ចូលឈ្មោះរបស់អ្នក',
-        'message.messageToKids': 'សារទៅកុមារា (Message to Kids)',
+        'message.messageToKids': 'សារទៅកុមារ (Message to Kids)',
         'message.messagePlaceholder': 'សរសេរសារលើកទឹកចិត្តទៅកុមារ...',
         'message.sendButton': 'បញ្ជូនសារ (Send Message)',
-        'message.fromDonors': 'សារពីអ្នកបរិច្ចាគ (Messages from Donors)',
+        'message.fromDonors': 'សារពីសប្បុរសជន (Messages from Donors)',
         'message.noMessages': 'មិនទាន់មានសារនៅឡើយទេ។ សូមក្លាយជាអ្នកដំបូងក្នុងការផ្ញើសារលើកទឹកចិត្តទៅកុមារៗ!',
         'message.noMessagesEn': '(No messages yet. Be the first to send an encouraging message to the kids!)',
 
@@ -77,6 +77,11 @@ const translations: Record<Language, Record<string, string>> = {
         'notification.failed': 'បរាជ័យក្នុងការបញ្ជូនសារ (Failed to send message)',
         'notification.error': 'មានបញ្ហាក្នុងការបញ្ជូនសារ (Error sending message)',
         'notification.fillForm': 'សូមបំពេញឈ្មោះ និងសាររបស់អ្នក (Please fill in your name and message)',
+
+        // International Donation
+        'international.title': 'បរិច្ចាគពីបរទេស',
+        'international.description': 'សម្រាប់អ្នកបរិច្ចាគពីបរទេស សូមចុចលើប៊ូតុងខាងក្រោមដើម្បីបរិច្ចាគតាមរយៈវេទិកាអន្តរជាតិ',
+        'international.button': 'បរិច្ចាគតាមរយះ Khmer Care',
 
         // Footer
         'footer.organizedBy': 'រៀបចំដោយ៖',
@@ -131,6 +136,11 @@ const translations: Record<Language, Record<string, string>> = {
         'notification.failed': 'Failed to send message',
         'notification.error': 'Error sending message',
         'notification.fillForm': 'Please fill in your name and message',
+
+        // International Donation
+        'international.title': 'International Donation',
+        'international.description': 'For international donors, please click the button below to donate through our international platform',
+        'international.button': 'Donate via Khmer Care',
 
         // Footer
         'footer.organizedBy': 'Organized by:',
