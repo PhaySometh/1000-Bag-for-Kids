@@ -130,11 +130,10 @@ export default function Home() {
       {showNotification && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div
-            className={`max-w-md w-full mx-4 p-6 rounded-lg shadow-2xl transform transition-all ${
-              notificationType === "success"
+            className={`max-w-md w-full mx-4 p-6 rounded-lg shadow-2xl transform transition-all ${notificationType === "success"
                 ? "bg-green-500"
                 : "bg-red-500"
-            }`}
+              }`}
           >
             <div className="flex items-center gap-4">
               <div className="text-4xl">
