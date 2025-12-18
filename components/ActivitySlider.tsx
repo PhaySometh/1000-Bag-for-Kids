@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const IMAGES = Array.from(
   { length: 24 },
@@ -6,6 +7,7 @@ const IMAGES = Array.from(
 );
 
 export default function ActivitySlider() {
+  const { t } = useLanguage();
   const N = IMAGES.length;
   const base = N; // start index of the middle copy
   const RENDER_IMAGES = Array.from({ length: N * 3 }, (_, i) => IMAGES[i % N]);
@@ -124,8 +126,8 @@ export default function ActivitySlider() {
         const updatedTargetCenter = Math.max(
           0,
           updatedTarget.offsetLeft +
-            updatedTarget.offsetWidth / 2 -
-            containerW / 2
+          updatedTarget.offsetWidth / 2 -
+          containerW / 2
         );
         try {
           containerEl.scrollTo({
@@ -234,7 +236,7 @@ export default function ActivitySlider() {
     dragRef.current.startScrollLeft = containerEl.scrollLeft;
     try {
       containerEl.setPointerCapture(e.pointerId);
-    } catch (_) {}
+    } catch (_) { }
     setIsDragging(true);
     // disable snap while dragging so we don't get a snap jump
     setSuppressSnap(true);
@@ -255,7 +257,7 @@ export default function ActivitySlider() {
     dragRef.current.down = false;
     try {
       containerEl.releasePointerCapture(e.pointerId);
-    } catch (_) {}
+    } catch (_) { }
     setIsDragging(false);
     const ci = findClosestIndex();
     const logical = getLogical(ci);
@@ -279,7 +281,7 @@ export default function ActivitySlider() {
   return (
     <div
       role="region"
-      aria-label="សកម្មភាពខ្លះៗរបស់យើង"
+      aria-label={t("activities")}
       className="w-full mt-6 p-4 animate-fadeUp"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -289,8 +291,8 @@ export default function ActivitySlider() {
         if (e.key === "ArrowRight") next();
       }}
     >
-      <h2 className="text-2xl md:text-3xl font-bold mb-2 text-darkBlue text-center">
-        សកម្មភាពខ្លះៗរបស់យើង
+      <h2 className="text-2xl md:text-3xl font-bold mb-2 text-white text-center">
+        {t("activities")}
       </h2>
 
       <div className="relative">
@@ -301,9 +303,8 @@ export default function ActivitySlider() {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
           onScroll={onScroll}
-          className={`overflow-x-auto overflow-y-hidden w-full mx-auto ${
-            isDragging ? "cursor-grabbing" : "cursor-grab"
-          }`}
+          className={`overflow-x-auto overflow-y-hidden w-full mx-auto ${isDragging ? "cursor-grabbing" : "cursor-grab"
+            }`}
           style={{
             maxWidth: "100%",
             scrollSnapType: (suppressSnap ? "none" : "x mandatory") as any,
@@ -331,9 +332,8 @@ export default function ActivitySlider() {
                   <img
                     src={src}
                     alt={`activity-${(i % N) + 1}`}
-                    className={`w-full h-full object-contain bg-white/2 ${
-                      isCenter ? "shadow-2xl" : ""
-                    }`}
+                    className={`w-full h-full object-contain bg-white/2 ${isCenter ? "shadow-2xl" : ""
+                      }`}
                     loading="lazy"
                     style={{ backgroundColor: "rgba(255,255,255,0.02)" }}
                   />
@@ -368,9 +368,8 @@ export default function ActivitySlider() {
               key={i}
               onClick={() => goToLogicalIndex(i)}
               aria-label={`Go to slide ${i + 1}`}
-              className={`w-2 h-2 rounded-full ${
-                i === (index - base + N) % N ? "bg-white" : "bg-white/20"
-              }`}
+              className={`w-2 h-2 rounded-full ${i === (index - base + N) % N ? "bg-white" : "bg-white/20"
+                }`}
             />
           ))}
         </div>

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import ProgressBar from "../components/ProgressBar";
 import Image from "next/image";
 import ActivitySlider from "../components/ActivitySlider";
+import LanguageSwitcher from "../components/LanguageSwitcher";
+import { useLanguage } from "../contexts/LanguageContext";
 
 type Campaign = {
   title: string;
@@ -23,6 +25,7 @@ type Message = {
 };
 
 export default function Home() {
+  const { t, language } = useLanguage();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [donorName, setDonorName] = useState("");
   const [donorMessage, setDonorMessage] = useState("");
@@ -33,10 +36,9 @@ export default function Home() {
 
   // compute parts for title: prefix (text before numeral), numeral, and rest (after numeral)
   const titleParts = (() => {
-    const defaultTitle = "មូលនិធិ៥ពាន់កាបូបនៃស្នាមញញឹម";
-    const t = campaign?.title ?? defaultTitle;
+    const title = `${t('hero.title.prefix')} ${t('hero.title.number')} ${t('hero.title.suffix')}`;
     try {
-      const parts = t.match(/\p{N}+|[^\p{N}]+/gu) || [t];
+      const parts = title.match(/\p{N}+|[^\p{N}]+/gu) || [title];
       const index = parts.findIndex((p) => /^\p{N}+$/u.test(p));
       if (index >= 0) {
         const prefix = parts.slice(0, index).join("").trim();
@@ -44,9 +46,9 @@ export default function Home() {
         const rest = parts.slice(index + 1).join("").trim();
         return { prefix, numeral, rest };
       }
-      return { prefix: t, numeral: "", rest: "" };
+      return { prefix: title, numeral: "", rest: "" };
     } catch (err) {
-      return { prefix: t, numeral: "", rest: "" };
+      return { prefix: title, numeral: "", rest: "" };
     }
   })();
 
@@ -108,31 +110,34 @@ export default function Home() {
 
         // Check if the request was successful
         if (res.ok) {
-          showNotificationOverlay("សារត្រូវបានបញ្ជូនដោយជោគជ័យ! (Message sent successfully!)", "success");
+          showNotificationOverlay(t('notification.success'), "success");
           setDonorName("");    // Clear the input
           setDonorMessage(""); // Clear the input
           loadMessages();      // Reload the message list
         } else {
-          showNotificationOverlay("បរាជ័យក្នុងការបញ្ជូនសារ (Failed to send message)", "error");
+          showNotificationOverlay(t('notification.failed'), "error");
         }
       } catch (error) {
         console.error("Error submitting message:", error);
-        showNotificationOverlay("មានបញ្ហាក្នុងការបញ្ជូនសារ (Error sending message)", "error");
+        showNotificationOverlay(t('notification.error'), "error");
       }
     } else {
       // Handle empty inputs
-      showNotificationOverlay("សូមបំពេញឈ្មោះ និងសាររបស់អ្នក (Please fill in your name and message)", "error");
+      showNotificationOverlay(t('notification.fillForm'), "error");
     }
   };
   return (
     <div className="min-h-screen bg-campaign-gradient text-white">
+      {/* Language Switcher */}
+      <LanguageSwitcher />
+
       {/* Notification Overlay */}
       {showNotification && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div
             className={`max-w-md w-full mx-4 p-6 rounded-lg shadow-2xl transform transition-all ${notificationType === "success"
-                ? "bg-green-500"
-                : "bg-red-500"
+              ? "bg-green-500"
+              : "bg-red-500"
               }`}
           >
             <div className="flex items-center gap-4">
@@ -173,7 +178,7 @@ export default function Home() {
                 </span>
               ) : null}
               {titleParts.numeral ? (
-                <span className="inline-block ml-2 mr-2 text-6xl md:text-7xl align-bottom text-white">
+                <span className={`inline-block ml-2 mr-2 align-bottom text-white ${language === 'km' ? 'text-6xl md:text-7xl' : 'text-3xl md:text-5xl'}`}>
                   {titleParts.numeral}
                 </span>
               ) : null}
@@ -201,7 +206,7 @@ export default function Home() {
                 milestone={1000}
               />
               <div className="text-xs text-white/80 mt-2">
-                កែប្រែចុងក្រោយ​:{" "}
+                {t('hero.lastUpdated')}{" "}
                 {campaign?.last_updated
                   ? new Date(campaign.last_updated).toLocaleString()
                   : "—"}
@@ -215,7 +220,7 @@ export default function Home() {
         {/* About Section */}
         <section className="mt-6 p-4 animate-fadeUp">
           <h2 className="text-2xl md:text-3xl font-bold mb-2 text-darkBlue">
-            អំពីមូលនិធិ
+            {t('about.title')}
           </h2>
           <p
             className="text-base md:text-lg text-darkBlue font-semibold p-4 rounded-l-md"
@@ -224,36 +229,23 @@ export default function Home() {
                 "linear-gradient(90deg, rgba(248,141,42,0.95) 0%, rgba(248,141,42,0.12) 100%)",
             }}
           >
-            បណ្ឌិត្យសភាបច្ចេកវិទ្យាឌីជីថលកម្ពុជា (CADT), Makerspace
-            និងសមាគមនិស្សិតមានសេចក្ដីរំភើបដែលបានចូលរួមរៀបចំ
-            មូលនិធិ៥ពាន់កាបូបនៃស្នាមញញឹម ដែលយើងមានគោលបំណងរួម
-            ក្នុងការបរិច្ចាគដើម្បីផ្តល់ស្នាមញញឹមដល់ កុមារា កុមារីតូចៗ
-            ជាកាបូបផ្ទុកដោយសម្ភារសិក្សា អាហារ
-            សំលៀកបំពាក់ជាដើមដែលកំពុងត្រូវការជំនួយ។ ហើយអ្វីដែលកាន់តែរំភើបជាងនេះគឺ
-            សិស្សច្បង សិស្សប្អូន និងមិត្តភក្តិរួមជំនាន់ទាំងអស់
-            ក៏អាចក្លាយជាផ្នែកមួយនៃការចូលរួមរៀបចំ មូលនិធិនេះផងដែរ។
-            ការចូលរួមរបស់និស្សិតទាំងអស់ មិនថាការចូលរួមជាកម្លាំង
-            ការបរិច្ចាគជាថវិការ​ អាហារ ឬជាសម្ភារៈប្រើប្រាស់នានាក្ដី
-            ពិតជាបានបង្ហាញនូវការរួបរួមគ្នា សាមគ្គីគ្នា
-            និងបង្ហាញនូវស្មារតីស្នេហាជាតិដោយយកចិត្តទុកដាក់នៅក្នុងគ្រាដ៏លំបាកនេះ។
+            {t('about.description')}
           </p>
         </section>
 
         {/* Needed Items Section */}
         <section className="mt-6 p-4 animate-fadeUp">
           <h2 className="text-2xl md:text-3xl font-bold mb-2 text-darkBlue">
-            សម្ភារៈតម្រូវការបរិច្ចាគ
+            {t('itemsNeed.title')}
           </h2>
           <ul className="space-y-3">
-            {(
-              campaign?.donation_items ?? [
-                "អាវរងារ និងសម្លៀកបំពាក់ផ្សេងៗ",
-                "ភេសជ្ជៈនំចំណី",
-                "សៀវភៅសម្រាប់អាន",
-                "សម្ភារៈសម្រាប់សរសេរ និងគូរ",
-                "សម្ភារៈក្មេងលេង",
-              ]
-            ).map((it, idx) => {
+            {[
+              t('itemsNeed.clothes'),
+              t('itemsNeed.snacks'),
+              t('itemsNeed.books'),
+              t('itemsNeed.stationery'),
+              t('itemsNeed.toys'),
+            ].map((it, idx) => {
               const icons = ["👕", "🍪", "📚", "✏️", "🧸"];
               const icon = icons[idx % icons.length];
               return (
@@ -278,7 +270,7 @@ export default function Home() {
         {/* Location Section */}
         <section className="mt-6 p-4 animate-fadeUp">
           <h2 className="text-2xl md:text-3xl font-bold mb-2 text-darkBlue">
-            ទីតាំងទទួលបរិច្ចាគ៖
+            {t('location.title')}
           </h2>
           <div className="mb-2">
             <div className="inline-flex items-center gap-3">
@@ -294,7 +286,7 @@ export default function Home() {
               <div className="text-left">
                 <div className="text-darkBlue">
                   <span className="font-bold">Makerspace,</span>
-                  <span className="ml-1"> Innovation Center - CADT</span>
+                  <span className="ml-1"> {t('location.makerspace')}</span>
                 </div>
               </div>
             </div>
@@ -336,11 +328,7 @@ export default function Home() {
               </div>
               <div className="text-left">
                 <div className="text-darkBlue">
-                  <span className="font-bold">មជ្ឈមណ្ឌលផ្ដល់សេវាសាធារណៈ</span>
-                  <span className="ml-1">
-                    {" "}
-                    (Public Service Center) របស់ក្រសួងប្រៃសណីយ៍ និងទូរគមនាគមន៍
-                  </span>
+                  <span className="font-bold">{t('location.publicService')}</span>
                 </div>
               </div>
             </div>
@@ -364,7 +352,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-3 py-2 bg-primary text-white rounded-md shadow-sm"
               >
-                Get Directions
+                {t('location.directions')}
               </a>
             </div>
           </div>
@@ -373,7 +361,7 @@ export default function Home() {
         {/* Donate Section (QR Codes) */}
         <section className="mt-6 p-4 text-center animate-fadeUp">
           <h2 className="text-2xl md:text-3xl font-bold mb-2 text-darkBlue flex items-center justify-center gap-2 donate-header">
-            <span className="align-bottom">អាចបរិច្ចាគតាមរយៈ</span>
+            <span className="align-bottom">{t('qr.title.prefix')}</span>
             <div className="w-10 md:w-14 lg:w-16 shrink-0">
               <Image
                 src="/images/khqr.png"
@@ -383,7 +371,7 @@ export default function Home() {
                 className="w-full h-auto"
               />
             </div>
-            <span className="align-bottom donate-last">ខាងក្រោមនេះ</span>
+            <span className="align-bottom donate-last">{t('qr.title.suffix')}</span>
           </h2>
 
           <div className="mx-auto w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 py-4">
@@ -416,8 +404,8 @@ export default function Home() {
 
         {/* Message to Kids Section */}
         <section className="mt-6 p-4 animate-fadeUp">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4 text-darkBlue text-center">
-            សរសេរសារជូនកុមារ
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 text-white text-center">
+            {t('message.title')}
           </h2>
           <div className="max-w-2xl mx-auto">
             <form
@@ -429,7 +417,7 @@ export default function Home() {
                   htmlFor="donorName"
                   className="block text-white font-semibold mb-2"
                 >
-                  ឈ្មោះរបស់អ្នក (Your Name)
+                  {t('message.yourName')}
                 </label>
                 <input
                   type="text"
@@ -437,7 +425,7 @@ export default function Home() {
                   value={donorName}
                   onChange={(e) => setDonorName(e.target.value)}
                   className="w-full px-4 py-2 rounded-md bg-white text-darkBlue focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="បញ្ចូលឈ្មោះរបស់អ្នក"
+                  placeholder={t('message.yourNamePlaceholder')}
                   required
                 />
               </div>
@@ -446,14 +434,14 @@ export default function Home() {
                   htmlFor="donorMessage"
                   className="block text-white font-semibold mb-2"
                 >
-                  សារទៅកុមារា (Message to Kids)
+                  {t('message.messageToKids')}
                 </label>
                 <textarea
                   id="donorMessage"
                   value={donorMessage}
                   onChange={(e) => setDonorMessage(e.target.value)}
                   className="w-full px-4 py-2 rounded-md bg-white text-darkBlue focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-                  placeholder="សរសេរសារលើកទឹកចិត្តទៅកុមារ..."
+                  placeholder={t('message.messagePlaceholder')}
                   rows={4}
                   required
                 />
@@ -462,13 +450,13 @@ export default function Home() {
                 type="submit"
                 className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-6 rounded-md transition-colors"
               >
-                បញ្ជូនសារ (Send Message)
+                {t('message.sendButton')}
               </button>
             </form>
 
             <div className="mt-8">
-              <h3 className="text-xl font-bold mb-4 text-darkBlue text-center">
-                សារពីអ្នកបរិច្ចាគ (Messages from Donors)
+              <h3 className="text-3xl font-bold mb-4 text-white text-center">
+                {t('message.fromDonors')}
               </h3>
               {messages.length > 0 ? (
                 <div className="space-y-4 max-h-[500px] overflow-y-auto">
@@ -499,13 +487,13 @@ export default function Home() {
               ) : (
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-center">
                   <p className="text-white/70">
-                    មិនទាន់មានសារនៅឡើយទេ។
-                    សូមក្លាយជាអ្នកដំបូងក្នុងការផ្ញើសារលើកទឹកចិត្តទៅកុមារៗ!
+                    {t('message.noMessages')}
                   </p>
-                  <p className="text-white/70 text-sm mt-2">
-                    (No messages yet. Be the first to send an encouraging
-                    message to the kids!)
-                  </p>
+                  {t('message.noMessagesEn') && (
+                    <p className="text-white/70 text-sm mt-2">
+                      {t('message.noMessagesEn')}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -530,7 +518,7 @@ export default function Home() {
             </div>
             <div className="w-full sm:w-1/4 flex flex-col items-start justify-center">
               <div className="text-sm text-white/90 mb-2 text-left">
-                រៀបចំដោយ៖
+                {t('footer.organizedBy')}
               </div>
               <div className="w-full max-w-[140px]">
                 <Image
