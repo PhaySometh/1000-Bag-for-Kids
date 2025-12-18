@@ -27,6 +27,9 @@ export default function Home() {
   const [donorName, setDonorName] = useState("");
   const [donorMessage, setDonorMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [notificationType, setNotificationType] = useState<"success" | "error">("success");
 
   // compute parts for title: prefix (text before numeral), numeral, and rest (after numeral)
   const titleParts = (() => {
@@ -79,9 +82,17 @@ export default function Home() {
     loadMessages();
   }, []);
 
+  // Show notification overlay
+  const showNotificationOverlay = (message: string, type: "success" | "error") => {
+    setNotificationMessage(message);
+    setNotificationType(type);
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 3000);
+  };
   // Handle Form Submission via API
   const handleSubmitMessage = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (donorName.trim() && donorMessage.trim()) {
       try {
         const res = await fetch("/api/messages/create", {
@@ -95,26 +106,56 @@ export default function Home() {
           }),
         });
 
-        const data = await res.json();
-
-        if (data.success) {
-          setDonorName("");
-          setDonorMessage("");
-          // Reload messages to show the new one
-          loadMessages();
-          alert("សារត្រូវបានបញ្ជូនដោយជោគជ័យ! (Message sent successfully!)");
+        // Check if the request was successful
+        if (res.ok) {
+          showNotificationOverlay("សារត្រូវបានបញ្ជូនដោយជោគជ័យ! (Message sent successfully!)", "success");
+          setDonorName("");    // Clear the input
+          setDonorMessage(""); // Clear the input
+          loadMessages();      // Reload the message list
         } else {
-          alert("បរាជ័យក្នុងការបញ្ជូនសារ (Failed to send message)");
+          showNotificationOverlay("បរាជ័យក្នុងការបញ្ជូនសារ (Failed to send message)", "error");
         }
       } catch (error) {
         console.error("Error submitting message:", error);
-        alert("មានបញ្ហាក្នុងការបញ្ជូនសារ (Error sending message)");
+        showNotificationOverlay("មានបញ្ហាក្នុងការបញ្ជូនសារ (Error sending message)", "error");
       }
+    } else {
+      // Handle empty inputs
+      showNotificationOverlay("សូមបំពេញឈ្មោះ និងសាររបស់អ្នក (Please fill in your name and message)", "error");
     }
   };
-
   return (
     <div className="min-h-screen bg-campaign-gradient text-white">
+      {/* Notification Overlay */}
+      {showNotification && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div
+            className={`max-w-md w-full mx-4 p-6 rounded-lg shadow-2xl transform transition-all ${
+              notificationType === "success"
+                ? "bg-green-500"
+                : "bg-red-500"
+            }`}
+          >
+            <div className="flex items-center gap-4">
+              <div className="text-4xl">
+                {notificationType === "success" ? "✅" : "❌"}
+              </div>
+              <div className="flex-1">
+                <p className="text-white font-bold text-lg">
+                  {notificationMessage}
+                </p>
+              </div>
+              <button
+                onClick={() => setShowNotification(false)}
+                className="text-white hover:text-gray-200 text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <section className="relative w-full h-[520px] sm:h-[640px] md:h-[720px] overflow-hidden">
         <Image
           src="/images/hero.png"
