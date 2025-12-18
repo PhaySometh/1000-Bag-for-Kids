@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import ProgressBar from "../components/ProgressBar";
-
 import Image from "next/image";
 import ActivitySlider from "../components/ActivitySlider";
 
@@ -17,8 +16,17 @@ type Campaign = {
   last_updated?: string;
 };
 
+type Message = {
+  name: string;
+  message: string;
+  created_at: string;
+};
+
 export default function Home() {
   const [campaign, setCampaign] = useState<Campaign | null>(null);
+  const [donorName, setDonorName] = useState("");
+  const [donorMessage, setDonorMessage] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
 
   // compute parts for title: prefix (text before numeral), numeral, and rest (after numeral)
   const titleParts = (() => {
@@ -30,10 +38,7 @@ export default function Home() {
       if (index >= 0) {
         const prefix = parts.slice(0, index).join("").trim();
         const numeral = parts[index];
-        const rest = parts
-          .slice(index + 1)
-          .join("")
-          .trim();
+        const rest = parts.slice(index + 1).join("").trim();
         return { prefix, numeral, rest };
       }
       return { prefix: t, numeral: "", rest: "" };
@@ -42,21 +47,71 @@ export default function Home() {
     }
   })();
 
-  // map embed functions removed (no map shown)
-
   async function load() {
-    const res = await fetch("/api/campaign/get");
-    const data = await res.json();
-    setCampaign(data);
+    try {
+      const res = await fetch("/api/campaign/get");
+      const data = await res.json();
+      setCampaign(data);
+    } catch (error) {
+      console.error("Error loading campaign:", error);
+    }
   }
 
+  async function loadMessages() {
+    try {
+      const res = await fetch("/api/messages/list");
+      const data = await res.json();
+      console.log("Messages API response:", data); // Debug log
+      if (data.success && data.data) {
+        setMessages(data.data);
+        console.log("Loaded messages:", data.data.length); // Debug log
+      } else {
+        console.log("No messages or API error:", data);
+      }
+    } catch (error) {
+      console.error("Error loading messages:", error);
+    }
+  }
+
+  // Initial Data Load
   useEffect(() => {
     load();
-    const t = setInterval(load, 10000);
-    return () => clearInterval(t);
+    loadMessages();
   }, []);
 
-  // map resolver removed (map UI removed)
+  // Handle Form Submission via API
+  const handleSubmitMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (donorName.trim() && donorMessage.trim()) {
+      try {
+        const res = await fetch("/api/messages/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: donorName.trim(),
+            message: donorMessage.trim(),
+          }),
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          setDonorName("");
+          setDonorMessage("");
+          // Reload messages to show the new one
+          loadMessages();
+          alert("សារត្រូវបានបញ្ជូនដោយជោគជ័យ! (Message sent successfully!)");
+        } else {
+          alert("បរាជ័យក្នុងការបញ្ជូនសារ (Failed to send message)");
+        }
+      } catch (error) {
+        console.error("Error submitting message:", error);
+        alert("មានបញ្ហាក្នុងការបញ្ជូនសារ (Error sending message)");
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-campaign-gradient text-white">
@@ -115,9 +170,9 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <main className="max-w-3xl mx-auto p-4">
-        {/* Hero removed (full-width hero is above) */}
 
+      <main className="max-w-3xl mx-auto p-4">
+        {/* About Section */}
         <section className="mt-6 p-4 animate-fadeUp">
           <h2 className="text-2xl md:text-3xl font-bold mb-2 text-darkBlue">
             អំពីមូលនិធិ
@@ -144,6 +199,7 @@ export default function Home() {
           </p>
         </section>
 
+        {/* Needed Items Section */}
         <section className="mt-6 p-4 animate-fadeUp">
           <h2 className="text-2xl md:text-3xl font-bold mb-2 text-darkBlue">
             សម្ភារៈតម្រូវការបរិច្ចាគ
@@ -179,12 +235,13 @@ export default function Home() {
           </ul>
         </section>
 
+        {/* Location Section */}
         <section className="mt-6 p-4 animate-fadeUp">
           <h2 className="text-2xl md:text-3xl font-bold mb-2 text-darkBlue">
             ទីតាំងទទួលបរិច្ចាគ៖
           </h2>
           <div className="mb-2">
-            <div className="inline-flex items-end gap-3">
+            <div className="inline-flex items-center gap-3">
               <div className="w-7 sm:w-8">
                 <Image
                   src="/images/location.png"
@@ -216,9 +273,7 @@ export default function Home() {
             </div>
             <div className="mt-2 flex items-center gap-3">
               <a
-                href={
-                  "https://www.google.com/maps/dir//CADT+-+Innovation+Center,+2nd+Bridge+Prek+Leap,+National+Road+Number+6,+Phnom+Penh,+12252/@11.6541735,104.9089508,17z/data=!4m8!4m7!1m0!1m5!1m1!1s0x310953bad45e4ee1:0x6c33cb023d508017!2m2!1d104.9114229!2d11.654289?hl=en&entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoKLDEwMDc5MjA3M0gBUAM%3D"
-                }
+                href={"https://www.google.com/maps/dir//CADT+-+Innovation+Center,+2nd+Bridge+Prek+Leap,+National+Road+Number+6,+Phnom+Penh,+12252/@11.6541735,104.9089508,17z/data=!4m8!4m7!1m0!1m5!1m1!1s0x310953bad45e4ee1:0x6c33cb023d508017!2m2!1d104.9114229!2d11.654289?hl=en&entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoKLDEwMDc5MjA3M0gBUAM%3D"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-3 py-2 bg-primary text-white rounded-md shadow-sm"
@@ -229,7 +284,7 @@ export default function Home() {
           </div>
           {/* New second location - Public Service Center */}
           <div className="mb-2 mt-6">
-            <div className="inline-flex items-end gap-3">
+            <div className="inline-flex items-center gap-3">
               <div className="w-7 sm:w-8">
                 <Image
                   src="/images/location.png"
@@ -264,9 +319,7 @@ export default function Home() {
             </div>
             <div className="mt-2 flex items-center gap-3">
               <a
-                href={
-                  "https://www.google.com/maps/dir//Ministry+of+Post+and+Telecommunications,+Builing+13+Preah+Monivong+Blvd+(93),+Phnom+Penh/@11.5752534,104.9175312,253m/data=!3m1!1e3!4m16!1m7!3m6!1s0x31095142eadcf8db:0xbd4e32a5eccddfb7!2sMinistry+of+Post+and+Telecommunications!8m2!3d11.5752627!4d104.9173786!16s%2Fg%2F1yfdrw680!4m7!1m0!1m5!1m1!1s0x31095142eadcf8db:0xbd4e32a5eccddfb7!2m2!1d104.9173786!2d11.5752627?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoKLDEwMDc5MjA3M0gBUAM%3D"
-                }
+                href={"https://www.google.com/maps/dir//Ministry+of+Post+and+Telecommunications,+Builing+13+Preah+Monivong+Blvd+(93),+Phnom+Penh/@11.5752534,104.9175312,253m/data=!3m1!1e3!4m16!1m7!3m6!1s0x31095142eadcf8db:0xbd4e32a5eccddfb7!2sMinistry+of+Post+and+Telecommunications!8m2!3d11.5752627!4d104.9173786!16s%2Fg%2F1yfdrw680!4m7!1m0!1m5!1m1!1s0x31095142eadcf8db:0xbd4e32a5eccddfb7!2m2!1d104.9173786!2d11.5752627?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoKLDEwMDc5MjA3M0gBUAM%3D"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-3 py-2 bg-primary text-white rounded-md shadow-sm"
@@ -277,6 +330,7 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Donate Section (QR Codes) */}
         <section className="mt-6 p-4 text-center animate-fadeUp">
           <h2 className="text-2xl md:text-3xl font-bold mb-2 text-darkBlue flex items-center justify-center gap-2 donate-header">
             <span className="align-bottom">អាចបរិច្ចាគតាមរយៈ</span>
@@ -289,10 +343,11 @@ export default function Home() {
                 className="w-full h-auto"
               />
             </div>
-
             <span className="align-bottom donate-last">ខាងក្រោមនេះ</span>
           </h2>
+
           <div className="mx-auto w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 py-4">
+            {/* USD QR */}
             <div className="flex flex-col items-center w-full">
               <div className="w-44 sm:w-72">
                 <Image
@@ -304,6 +359,7 @@ export default function Home() {
                 />
               </div>
             </div>
+            {/* KHR QR */}
             <div className="flex flex-col items-center w-full">
               <div className="w-44 sm:w-72">
                 <Image
@@ -318,8 +374,108 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Message to Kids Section */}
+        <section className="mt-6 p-4 animate-fadeUp">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 text-darkBlue text-center">
+            សរសេរសារជូនកុមារ
+          </h2>
+          <div className="max-w-2xl mx-auto">
+            <form
+              onSubmit={handleSubmitMessage}
+              className="bg-white/10 rounded-lg p-6 backdrop-blur-sm"
+            >
+              <div className="mb-4">
+                <label
+                  htmlFor="donorName"
+                  className="block text-white font-semibold mb-2"
+                >
+                  ឈ្មោះរបស់អ្នក (Your Name)
+                </label>
+                <input
+                  type="text"
+                  id="donorName"
+                  value={donorName}
+                  onChange={(e) => setDonorName(e.target.value)}
+                  className="w-full px-4 py-2 rounded-md bg-white text-darkBlue focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="បញ្ចូលឈ្មោះរបស់អ្នក"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="donorMessage"
+                  className="block text-white font-semibold mb-2"
+                >
+                  សារទៅកុមារា (Message to Kids)
+                </label>
+                <textarea
+                  id="donorMessage"
+                  value={donorMessage}
+                  onChange={(e) => setDonorMessage(e.target.value)}
+                  className="w-full px-4 py-2 rounded-md bg-white text-darkBlue focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                  placeholder="សរសេរសារលើកទឹកចិត្តទៅកុមារ..."
+                  rows={4}
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-6 rounded-md transition-colors"
+              >
+                បញ្ជូនសារ (Send Message)
+              </button>
+            </form>
+
+            <div className="mt-8">
+              <h3 className="text-xl font-bold mb-4 text-darkBlue text-center">
+                សារពីអ្នកបរិច្ចាគ (Messages from Donors)
+              </h3>
+              {messages.length > 0 ? (
+                <div className="space-y-4 max-h-[500px] overflow-y-auto">
+                  {messages.map((msg, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-white/20 backdrop-blur-sm rounded-lg p-4 border-l-4 border-primary"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-white">
+                          💝 {msg.name}
+                        </span>
+                        <span className="text-xs text-white/70">
+                          {new Date(msg.created_at).toLocaleDateString(
+                            "km-KH",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            }
+                          )}
+                        </span>
+                      </div>
+                      <p className="text-white/90 italic">"{msg.message}"</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-center">
+                  <p className="text-white/70">
+                    មិនទាន់មានសារនៅឡើយទេ។
+                    សូមក្លាយជាអ្នកដំបូងក្នុងការផ្ញើសារលើកទឹកចិត្តទៅកុមារៗ!
+                  </p>
+                  <p className="text-white/70 text-sm mt-2">
+                    (No messages yet. Be the first to send an encouraging
+                    message to the kids!)
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Activity Slider */}
         <ActivitySlider />
 
+        {/* Footer Logos */}
         <section className="mt-6 p-4 animate-fadeUp">
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
             <div className="w-full sm:w-3/4 flex items-end sm:justify-start">
