@@ -60,7 +60,7 @@ export default function Overlay() {
         <div className="min-h-screen flex items-center justify-center p-8">
             <div className="max-w-4xl w-full">
                 <div className="text-white">
-                    <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-center">
+                    {/* <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 text-center">
                         {titleParts.prefix ? (
                             <span className="text-altGreen align-bottom">
                                 {titleParts.prefix}
@@ -76,9 +76,9 @@ export default function Overlay() {
                                 {titleParts.rest}
                             </span>
                         ) : null}
-                    </h1>
+                    </h1> */}
 
-                    <div className="flex justify-center mb-6">
+                    {/* <div className="flex justify-center mb-6">
                         <div className="w-[400px] md:w-[600px] lg:w-[768px]">
                             <Image
                                 src="/images/bag.png"
@@ -88,7 +88,7 @@ export default function Overlay() {
                                 className="w-full h-auto"
                             />
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="w-full bg-white/20 backdrop-blur-md rounded-2xl p-6 shadow-2xl border border-white/30">
                         <ProgressBar
