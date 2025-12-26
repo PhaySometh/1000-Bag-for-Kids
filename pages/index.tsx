@@ -468,7 +468,7 @@ export default function Home() {
               {t('international.description')}
             </p>
             <a
-              href=""
+              href="https://khmercare.com/raise-funds/c105654f-9e7d-4c23-aca8-d45e62dd7e1b?owner=true"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-8 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-md shadow-lg transition-colors"
