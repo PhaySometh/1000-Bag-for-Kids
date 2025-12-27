@@ -10,7 +10,7 @@ export default async function handler(
   }
 
   try {
-    const { name, message } = req.body;
+    const { name, message, show_message } = req.body;
 
     // Validation
     if (!name || !message) {
@@ -26,6 +26,7 @@ export default async function handler(
         {
           name,
           message,
+          show_message: show_message ?? true, // Default to true if not provided
         },
       ])
       .select();

@@ -23,6 +23,7 @@ type Message = {
   name: string;
   message: string;
   created_at: string;
+  show_message?: boolean;
 };
 
 export default function Home() {
@@ -35,6 +36,8 @@ export default function Home() {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
   const [notificationType, setNotificationType] = useState<"success" | "error">("success");
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState<{ name: string; message: string } | null>(null);
 
   // compute parts for title: prefix (text before numeral), numeral, and rest (after numeral)
   const titleParts = (() => {
@@ -70,8 +73,10 @@ export default function Home() {
       const data = await res.json();
       console.log("Messages API response:", data); // Debug log
       if (data.success && data.data) {
-        setMessages(data.data);
-        console.log("Loaded messages:", data.data.length); // Debug log
+        // Filter to only show messages where show_message is true
+        const visibleMessages = data.data.filter((msg: Message) => msg.show_message === true);
+        setMessages(visibleMessages);
+        console.log("Loaded visible messages:", visibleMessages.length); // Debug log
       } else {
         console.log("No messages or API error:", data);
       }
@@ -103,34 +108,51 @@ export default function Home() {
     e.preventDefault();
 
     if (donorName.trim() && donorMessage.trim()) {
-      try {
-        const res = await fetch("/api/messages/create", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: donorName.trim(),
-            message: donorMessage.trim(),
-          }),
-        });
-
-        // Check if the request was successful
-        if (res.ok) {
-          showNotificationOverlay(t('notification.success'), "success");
-          setDonorName("");    // Clear the input
-          setDonorMessage(""); // Clear the input
-          loadMessages();      // Reload the message list
-        } else {
-          showNotificationOverlay(t('notification.failed'), "error");
-        }
-      } catch (error) {
-        console.error("Error submitting message:", error);
-        showNotificationOverlay(t('notification.error'), "error");
-      }
+      // Store pending message and show confirmation popup
+      setPendingMessage({
+        name: donorName.trim(),
+        message: donorMessage.trim()
+      });
+      setShowConfirmPopup(true);
     } else {
       // Handle empty inputs
       showNotificationOverlay(t('notification.fillForm'), "error");
+    }
+  };
+
+  // Submit message with show_message preference
+  const submitMessageWithVisibility = async (showMessage: boolean) => {
+    if (!pendingMessage) return;
+
+    try {
+      const res = await fetch("/api/messages/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: pendingMessage.name,
+          message: pendingMessage.message,
+          show_message: showMessage,
+        }),
+      });
+
+      // Check if the request was successful
+      if (res.ok) {
+        showNotificationOverlay(t('notification.success'), "success");
+        setDonorName("");    // Clear the input
+        setDonorMessage(""); // Clear the input
+        setPendingMessage(null);
+        setShowConfirmPopup(false);
+        loadMessages();      // Reload the message list
+      } else {
+        showNotificationOverlay(t('notification.failed'), "error");
+        setShowConfirmPopup(false);
+      }
+    } catch (error) {
+      console.error("Error submitting message:", error);
+      showNotificationOverlay(t('notification.error'), "error");
+      setShowConfirmPopup(false);
     }
   };
   return (
@@ -197,6 +219,45 @@ export default function Home() {
                 className="text-white hover:text-gray-200 text-2xl font-bold"
               >
                 ×
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Popup for Message Visibility */}
+      {showConfirmPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="max-w-md w-full mx-4 p-6 rounded-lg shadow-2xl bg-white relative">
+            <button
+              onClick={() => {
+                setShowConfirmPopup(false);
+                setPendingMessage(null);
+              }}
+              className="absolute top-4 right-4 text-darkBlue hover:text-darkBlue/70 text-2xl font-bold"
+            >
+              ×
+            </button>
+            <h3 className="text-xl font-bold text-darkBlue mb-4 pr-8">
+              {language === 'km' ? 'បង្ហាញសាររបស់អ្នកនៅលើគេហទំព័រ?' : 'Show your message on the website?'}
+            </h3>
+            <p className="text-darkBlue mb-6">
+              {language === 'km'
+                ? 'តើអ្នកចង់ឱ្យសាររបស់អ្នកបង្ហាញជាសាធារណៈនៅលើគេហទំព័រឬទេ?'
+                : 'Do you want your message to be displayed publicly on the website?'}
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => submitMessageWithVisibility(true)}
+                className="flex-1 bg-primary hover:bg-primary/90 text-white font-bold py-3 px-6 rounded-md transition-colors"
+              >
+                {language === 'km' ? 'បាទ/ចាស' : 'Yes'}
+              </button>
+              <button
+                onClick={() => submitMessageWithVisibility(false)}
+                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-md transition-colors"
+              >
+                {language === 'km' ? 'ទេ' : 'No'}
               </button>
             </div>
           </div>
